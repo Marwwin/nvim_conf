@@ -32,10 +32,19 @@ packer.startup(function()
   use 'saadparwaiz1/cmp_luasnip'
   use 'BurntSushi/ripgrep'
   use { 'nvim-telescope/telescope.nvim', tag = '0.1.2', requires = {{ 'nvim-lua/plenary.nvim'}}}
+  use { 'nvim-treesitter/nvim-treesitter', 
+        run = function ()
+            local ts_update = require('nvim-treesitter.install')
+                                .update({ with_sync = true })
+            ts_update()
+        end,
+    }
+  use 'nvim-ts-autotag'
+  use 'jiangmiao/auto-pairs'
   end
 )
 
 require'lsp_config'
 require'flags'
 require'telescope_config'
-
+require'treesitter_config'

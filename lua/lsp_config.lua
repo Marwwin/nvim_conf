@@ -2,6 +2,19 @@ local lspconfig = require'lspconfig'
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 local set = vim.keymap.set
 
+function defaultKeybindings()
+  set("n", "K", vim.lsp.buf.hover, {buffer=0})
+  set("n", "gd", vim.lsp.buf.definition, {buffer=0})
+  set("n", "gi", vim.lsp.buf.implementation, {buffer=0})
+  set("n", "gT", vim.lsp.buf.type_definition, {buffer=0})
+  set("n", " dj", vim.diagnostic.goto_next, {buffer=0})
+  set("n", " dk", vim.diagnostic.goto_prev, {buffer=0})
+  set("n", " dl", "<cmd>Telescope diagnostics<cr>", {buffer=0})
+  set("n", "<M-r>", "<cmd>Telescope lsp_references<cr>", {buffer=0})
+  set("n", " r", vim.lsp.buf.rename, {buffer=0})
+  set({"n", "v"}, "<M-d>", vim.lsp.buf.code_action, {buffer=0})
+  set("n", "?", "<cmd>lua require('telescope.builtin').find_files(require('telescope.themes').get_dropdown{previewer = false})<cr>", {buffer=0})
+end
 
 
 -- LSP 
@@ -27,12 +40,41 @@ end
 
 lspconfig.tsserver.setup{
 	capabilities = capabilities, 
-	on_attach = function (client)	
-    	print('Attaching to ' .. client.name)
-    	default_keymaps()
-    	set("n", "<C-i>", vim.lsp.buf.format, {buffer=0})
-end
+	on_attach = function (client)
+	    print('Attaching to ' .. client.name)
+        defaultKeybindings()  
+        set("n", "<C-i>", ":w<cr><cmd>!prettier % --write <cr>", {buffer=0})
+    end
 }
+
+lspconfig.html.setup{
+    capabilities = capabilities,
+    on_attach= function (client)
+        defaultKeybindings()
+        set("n", "<C-i>", ":w<cr><cmd>!prettier % --write <cr>", {buffer=0})
+    end,
+}
+
+lspconfig.pylsp.setup{
+    capabilities = capabilities,
+    on_attach = function (client)
+    	print('Attaching to ' .. client.name)
+        defaultKeybindings()
+        set("n", "<C-i>", vim.lsp.buf.format, {buffer=0})
+    end,
+    settings = {
+        black = {enabled = true},
+        autopep8 = {enabled = false},
+        yapf = {enabled = false},
+        pylint = {enabled = true, executable = "pylint"},
+        pyflakes = {enabled = false},
+        pylsp_mypy = {enabled = true},
+        pycodestyle = {enabled = false},
+        jedi_completion = {fuzzy = true},
+        pyls_isort = {fuzzy = true},
+    }
+}
+
 
 -- setup language servers here
 

@@ -7,6 +7,7 @@ set.softtabstop = 4
 set.shiftwidth = 4
 set.number = true
 set.relativenumber = true
+set.autoread = true
 
 vim.o.swapfiles = false
 vim.g.mapleader = ","
