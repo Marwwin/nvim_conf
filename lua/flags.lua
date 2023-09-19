@@ -8,6 +8,9 @@ set.shiftwidth = 4
 set.number = true
 set.relativenumber = true
 set.autoread = true
+set.swapfile = false
+
+vim.g.leader = ","
 
 vim.o.swapfiles = false
 vim.g.mapleader = ","
