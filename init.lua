@@ -30,7 +30,7 @@ packer.startup(function()
   use 'anott03/nvim-lspinstall'
   use 'L3MON4D3/LuaSnip'
   use 'saadparwaiz1/cmp_luasnip'
-
+  use 'BurntSushi/ripgrep'
   use { 'nvim-telescope/telescope.nvim', tag = '0.1.2', requires = {{ 'nvim-lua/plenary.nvim'}}}
   end
 )
@@ -38,3 +38,4 @@ packer.startup(function()
 require'lsp_config'
 require'flags'
 require'telescope_config'
+

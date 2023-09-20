@@ -3,22 +3,34 @@ local capabilities = require('cmp_nvim_lsp').default_capabilities()
 local set = vim.keymap.set
 
 
+
+-- LSP 
+
+local default_keymaps = function ()
+  set("n", "K", vim.lsp.buf.hover, {buffer=0})
+  set("n", "gd", vim.lsp.buf.definition, {buffer=0})
+  set("n", "gi", vim.lsp.buf.implementation, {buffer=0})
+  set("n", "gT", vim.lsp.buf.type_definition, {buffer=0})
+  set("n", " dj", vim.diagnostic.goto_next, {buffer=0})
+  set("n", " dk", vim.diagnostic.goto_prev, {buffer=0})
+  set("n", " r", vim.lsp.buf.rename, {buffer=0})
+  set({"n", "v"}, "<M-d>", vim.lsp.buf.code_action, {buffer=0})
+end
+
+lspconfig.gopls.setup{
+	capabilities = capabilities,
+	on_attach = function (client)
+	default_keymaps()
+    	set("n", "<C-i>", vim.lsp.buf.format, {buffer=0})
+end
+}
+
 lspconfig.tsserver.setup{
 	capabilities = capabilities, 
-	on_attach = function (client)
-	
-  print('Attaching to ' .. client.name)
-  vim.keymap.set("n", "K", vim.lsp.buf.hover, {buffer=0})
-  vim.keymap.set("n", "gd", vim.lsp.buf.definition, {buffer=0})
-  vim.keymap.set("n", "gi", vim.lsp.buf.implementation, {buffer=0})
-  vim.keymap.set("n", "gT", vim.lsp.buf.type_definition, {buffer=0})
-  vim.keymap.set("n", " dj", vim.diagnostic.goto_next, {buffer=0})
-  vim.keymap.set("n", " dk", vim.diagnostic.goto_prev, {buffer=0})
-  vim.keymap.set("n", " dl", "<cmd>Telescope diagnostics<cr>", {buffer=0})
-  vim.keymap.set("n", "<M-r>", "<cmd>Telescope lsp_references<cr>", {buffer=0})
-  vim.keymap.set("n", " r", vim.lsp.buf.rename, {buffer=0})
-  vim.keymap.set({"n", "v"}, "<M-d>", vim.lsp.buf.code_action, {buffer=0})
-  vim.keymap.set("n", "<C-i>", vim.lsp.buf.format, {buffer=0})
+	on_attach = function (client)	
+    	print('Attaching to ' .. client.name)
+    	default_keymaps()
+    	set("n", "<C-i>", vim.lsp.buf.format, {buffer=0})
 end
 }
 
