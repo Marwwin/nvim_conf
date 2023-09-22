@@ -13,7 +13,6 @@ function defaultKeybindings()
   set("n", "<M-r>", "<cmd>Telescope lsp_references<cr>", {buffer=0})
   set("n", " r", vim.lsp.buf.rename, {buffer=0})
   set({"n", "v"}, "<M-d>", vim.lsp.buf.code_action, {buffer=0})
-  set("n", "?", "<cmd>lua require('telescope.builtin').find_files(require('telescope.themes').get_dropdown{previewer = false})<cr>", {buffer=0})
 end
 
 
