@@ -2,17 +2,19 @@ local lspconfig = require'lspconfig'
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 local set = vim.keymap.set
 
-function defaultKeybindings()
-  set("n", "K", vim.lsp.buf.hover, {buffer=0})
-  set("n", "gd", vim.lsp.buf.definition, {buffer=0})
-  set("n", "gi", vim.lsp.buf.implementation, {buffer=0})
-  set("n", "gT", vim.lsp.buf.type_definition, {buffer=0})
-  set("n", " dj", vim.diagnostic.goto_next, {buffer=0})
-  set("n", " dk", vim.diagnostic.goto_prev, {buffer=0})
-  set("n", " dl", "<cmd>Telescope diagnostics<cr>", {buffer=0})
-  set("n", "<M-r>", "<cmd>Telescope lsp_references<cr>", {buffer=0})
-  set("n", " r", vim.lsp.buf.rename, {buffer=0})
-  set({"n", "v"}, "<M-d>", vim.lsp.buf.code_action, {buffer=0})
+function ToggleComment(comment, n)
+	print(n)
+	--	for i = 1 , n do 
+	--
+	--	local line = vim.fn.getline('.')
+--
+--		if string.match(line, '^' .. comment) then
+--			vim.fn.setline('.', string.sub(line, #comment +1))
+--		else
+--			vim.fn.setline('.', comment .. line)
+--		end
+--		vim.cmd('normal! j')
+--	end
 end
 
 
@@ -41,7 +43,7 @@ lspconfig.tsserver.setup{
 	capabilities = capabilities, 
 	on_attach = function (client)
 	    print('Attaching to ' .. client.name)
-        defaultKeybindings()  
+        default_keymaps()  
         set("n", "<C-i>", ":w<cr><cmd>!prettier % --write <cr>", {buffer=0})
     end
 }
@@ -49,7 +51,7 @@ lspconfig.tsserver.setup{
 lspconfig.html.setup{
     capabilities = capabilities,
     on_attach= function (client)
-        defaultKeybindings()
+        default_keymaps()
         set("n", "<C-i>", ":w<cr><cmd>!prettier % --write <cr>", {buffer=0})
     end,
 }
@@ -58,7 +60,8 @@ lspconfig.pylsp.setup{
     capabilities = capabilities,
     on_attach = function (client)
     	print('Attaching to ' .. client.name)
-        defaultKeybindings()
+        default_keymaps()
+		set("n",'<leader>c', [[:lua ToggleComment('# ', v:count)<cr>]],{ noremap=true, })
         set("n", "<C-i>", vim.lsp.buf.format, {buffer=0})
     end,
     settings = {
