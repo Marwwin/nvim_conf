@@ -29,6 +29,7 @@ local default_keymaps = function()
 	set("n", " dj", vim.diagnostic.goto_next, { buffer = 0 })
 	set("n", " dk", vim.diagnostic.goto_prev, { buffer = 0 })
 	set("n", "<leader>r", vim.lsp.buf.rename, { buffer = 0 })
+	set("n", "<leader>fe", vim.diagnostic.open_float, { buffer = 0 })
 	set({ "n", "v" }, "<M-d>", vim.lsp.buf.code_action, { buffer = 0 })
 end
 
@@ -86,7 +87,7 @@ lspconfig.lua_ls.setup {
 		print('Attaching to ' .. client.name)
 		default_keymaps()
 		set('n', "<leader>cc", [[:lua ToggleComment("-- ", vim.v.count)<CR>]], { noremap = true })
-		set("n", "<C-i>", vim.lsp.buf.format, { buffer = 0 })
+		set("n", "<C-i>", vim.lsp.buf.format, { buffer = 0, noremap=true })
 	end
 }
 

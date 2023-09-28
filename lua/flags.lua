@@ -18,4 +18,4 @@ vim.g.mapleader = ","
 
 
 -- 2 space tabs for .tpl files
-vim.cmd([[autocmd BufNewFile,BufRead *.tpl setlocal tabstop=2 softtabstop=2 shiftwidth=2 ]])
+vim.cmd([[autocmd BufNewFile,BufRead *.tpl setlocal tabstop=2 softtabstop=2 shiftwidth=2 expandtab=true ]])
