@@ -44,7 +44,7 @@ packer.startup(function()
   end
 )
 
-require'lsp_config'
 require'flags'
-require'telescope_config'
+-- require'telescope_config'
 require'treesitter_config'
+require'lsp_config'

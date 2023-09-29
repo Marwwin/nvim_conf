@@ -2,7 +2,8 @@ local vim = vim
 local lspconfig = require 'lspconfig'
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 local set = vim.keymap.set
---
+local builtin = require("telescope.builtin")
+
 -- Util Functions
 
 function ToggleComment(comment, n)
@@ -22,22 +23,28 @@ end
 -- LSP
 
 local default_keymaps = function()
-	set("n", "K", vim.lsp.buf.hover, { buffer = 0 })
-	set("n", "gd", vim.lsp.buf.definition, { buffer = 0 })
-	set("n", "gi", vim.lsp.buf.implementation, { buffer = 0 })
-	set("n", "gT", vim.lsp.buf.type_definition, { buffer = 0 })
-	set("n", " dj", vim.diagnostic.goto_next, { buffer = 0 })
-	set("n", " dk", vim.diagnostic.goto_prev, { buffer = 0 })
-	set("n", "<leader>r", vim.lsp.buf.rename, { buffer = 0 })
-	set("n", "<leader>fe", vim.diagnostic.open_float, { buffer = 0 })
-	set({ "n", "v" }, "<M-d>", vim.lsp.buf.code_action, { buffer = 0 })
+	set("n", "K", vim.lsp.buf.hover, { noremap = true })
+	set("n", "<leader>sa", vim.lsp.buf.definition, { noremap = true })
+	set("n", "<leader>i", vim.lsp.buf.implementation, { noremap = true })
+	set("n", "<leader>t", vim.lsp.buf.type_definition, { noremap = true })
+	set("n", "<leader>j", vim.diagnostic.goto_next, { noremap = true })
+	set("n", "<leader>k", vim.diagnostic.goto_prev, { noremap = true })
+	set("n", "<leader>r", vim.lsp.buf.rename, { noremap = true })
+	set("n", "<leader>dd", vim.diagnostic.open_float, { noremap = true })
+	set({ "n", "v" }, "<M-d>", vim.lsp.buf.code_action, { noremap = true })
+	set("n", "<leader>ff", builtin.find_files, { noremap = true })
+	set("n", "<leader>fg", builtin.live_grep, { noremap = true })
+	set("n", "<leader>fs", builtin.grep_string, { noremap = true })
+	set("n", "<leader>fb", builtin.buffers, { noremap = true })
+	set("n", "<leader>fd", function() vim.cmd("Telescope diagnostics") end, { noremap = true })
+	set("n", "<leader>fr", function() vim.cmd("Telescope lsp_references") end, { noremap = true })
 end
+default_keymaps()
 
 lspconfig.gopls.setup {
 	capabilities = capabilities,
 	on_attach = function(client)
-		default_keymaps()
-		set("n", "<C-i>", vim.lsp.buf.format, { buffer = 0 })
+		set("n", "<C-i>", vim.lsp.buf.format, { noremap = true })
 	end
 }
 
@@ -45,17 +52,15 @@ lspconfig.tsserver.setup {
 	capabilities = capabilities,
 	on_attach = function(client)
 		print('Attaching to ' .. client.name)
-		default_keymaps()
 		set('n', "<leader>cc", [[:lua ToggleComment("// ", vim.v.count)<CR>]], { noremap = true })
-		set("n", "<C-i>", ":w<cr><cmd>!prettier % --write <cr>", { buffer = 0 })
+		set("n", "<C-i>", ":w<cr><cmd>!prettier % --write <cr>", { noremap = true })
 	end
 }
 
 lspconfig.html.setup {
 	capabilities = capabilities,
 	on_attach = function(client)
-		default_keymaps()
-		set("n", "<C-i>", ":w<cr><cmd>!prettier % --write <cr>", { buffer = 0 })
+		set("n", "<C-i>", ":w<cr><cmd>!prettier % --write <cr>", { noremap = true })
 	end,
 }
 
@@ -64,9 +69,8 @@ lspconfig.pylsp.setup {
 	capabilities = capabilities,
 	on_attach = function(client)
 		print('Attaching to ' .. client.name)
-		default_keymaps()
 		set('n', "<leader>cc", [[:lua ToggleComment("# ", vim.v.count)<CR>]], { noremap = true })
-		set("n", "<C-i>", vim.lsp.buf.format, { buffer = 0 })
+		set("n", "<C-i>", vim.lsp.buf.format, { noremap = true })
 	end,
 	settings = {
 		black = { enabled = true },
@@ -85,9 +89,8 @@ lspconfig.lua_ls.setup {
 	capabilities = capabilities,
 	on_attach = function(client)
 		print('Attaching to ' .. client.name)
-		default_keymaps()
 		set('n', "<leader>cc", [[:lua ToggleComment("-- ", vim.v.count)<CR>]], { noremap = true })
-		set("n", "<C-i>", vim.lsp.buf.format, { buffer = 0, noremap=true })
+		set("n", "<C-i>", vim.lsp.buf.format, { noremap = true })
 	end
 }
 
