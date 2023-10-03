@@ -44,6 +44,10 @@ packer.startup(function()
   end
 )
 
+local options={
+	termguicolors = true
+}
+
 require'flags'
 -- require'telescope_config'
 require'treesitter_config'
