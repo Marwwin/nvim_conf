@@ -41,6 +41,7 @@ packer.startup(function()
     }
   use 'nvim-ts-autotag'
   use 'jiangmiao/auto-pairs'
+  use 'morhetz/gruvbox'
   end
 )
 

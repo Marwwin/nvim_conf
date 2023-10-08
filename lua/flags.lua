@@ -15,8 +15,7 @@ vim.g.leader = ","
 
 vim.o.swapfiles = false
 vim.g.mapleader = ","
-
-vim.cmd("colorscheme habamax")
+vim.cmd("colorscheme gruvbox")
 
 -- 2 space tabs for .tpl files
 vim.cmd([[autocmd BufNewFile,BufRead *.tpl setlocal tabstop=2 softtabstop=2 shiftwidth=2 expandtab=true ]])
