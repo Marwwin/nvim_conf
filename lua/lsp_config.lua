@@ -90,7 +90,7 @@ lspconfig.lua_ls.setup {
   on_attach = function(client)
     print('Attaching to ' .. client.name)
     set('n', "<leader>cc", [[:lua ToggleComment("-- ", vim.v.count)<CR>]], { noremap = true })
-    set("n", "<C-i>", vim.lsp.buf.format, { noremap = true })
+    set("n", "<M-f>", vim.lsp.buf.format, { noremap = true })
   end,
   settings = {
     Lua = {
