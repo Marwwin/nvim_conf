@@ -9,8 +9,9 @@ local builtin = require("telescope.builtin")
 function ToggleComment(comment, n)
   for i = 0, n do
     local line = vim.fn.getline('.')
-    if string.match(line, '^' .. comment) then
-      vim.fn.setline('.', string.sub(line, #comment + 1))
+    local start_of_comment, end_of_comment = line:find(comment, 1, true)
+    if start_of_comment then
+      vim.fn.setline('.', line:sub(end_of_comment + 1))
     else
       vim.fn.setline('.', comment .. line)
     end
