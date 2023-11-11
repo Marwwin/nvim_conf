@@ -33,8 +33,12 @@ local default_keymaps = function()
   set("n", "<leader>r", vim.lsp.buf.rename, { noremap = true })
   set("n", "<leader>dd", vim.diagnostic.open_float, { noremap = true })
   set({ "n", "v" }, "<M-d>", vim.lsp.buf.code_action, { noremap = true })
-  set("n", "<leader>ff", function() 
-    builtin.find_files({find_command = {"rg", "--files", "--hidden", "--follow", "--no-ignore-vcs", "-g", "!node_modules/*", "-g","!.git/"}}) end, { noremap = true })
+  set("n", "<leader>ff", function()
+    builtin.find_files({
+      find_command = { "rg", "--files", "--hidden", "--follow", "--no-ignore-vcs", "-g", "!node_modules/*", "-g",
+        "!.git/" }
+    })
+  end, { noremap = true })
   set("n", "<leader>fg", builtin.live_grep, { noremap = true })
   set("n", "<leader>fs", builtin.grep_string, { noremap = true })
   set("n", "<leader>fb", builtin.buffers, { noremap = true })
@@ -66,6 +70,20 @@ lspconfig.html.setup {
   end,
 }
 
+lspconfig.cssls.setup {
+  capabilities = capabilities,
+  on_attach = function(client)
+    set("n", "<C-i>", ":w<cr><cmd>!prettier % --write <cr>", { noremap = true, silent = true })
+  end,
+}
+
+lspconfig.jsonls.setup {
+  capabilities = capabilities,
+  on_attach = function(client)
+    set("n", "<C-i>", ":w<cr><cmd>!prettier % --write <cr>", { noremap = true, silent = true })
+  end
+}
+
 
 lspconfig.pylsp.setup {
   capabilities = capabilities,
@@ -92,7 +110,7 @@ lspconfig.lua_ls.setup {
   on_attach = function(client)
     print('Attaching to ' .. client.name)
     set('n', "<leader>cc", [[:lua ToggleComment("-- ", vim.v.count)<CR>]], { noremap = true })
-    set("n", "<M-f>", vim.lsp.buf.format, { noremap = true })
+    set("n", "<C-i>", vim.lsp.buf.format, { noremap = true })
   end,
   settings = {
     Lua = {
