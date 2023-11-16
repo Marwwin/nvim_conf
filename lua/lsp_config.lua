@@ -35,8 +35,20 @@ local default_keymaps = function()
   set({ "n", "v" }, "<M-d>", vim.lsp.buf.code_action, { noremap = true })
   set("n", "<leader>ff", function()
     builtin.find_files({
-      find_command = { "rg", "--files", "--hidden", "--follow", "--no-ignore-vcs", "-g", "!node_modules/*", "-g",
-        "!.git/" }
+      find_command = {
+        "rg", "--files",
+        "--hidden", "--follow",
+        "--no-ignore-vcs",
+        -- Git folders to ignore
+        "-g", "!.git/",
+        -- JS folder to ignore
+        "-g", "!node_modules/*",
+        -- Python folders to ignore
+        "-g", "!.mypy_cache/*",
+        "-g", "!*/.mypy_cache/*",
+        "-g", "!*/__pycache__/*",
+        "-g", "!__pycache__/*"
+      }
     })
   end, { noremap = true })
   set("n", "<leader>fg", builtin.live_grep, { noremap = true })
