@@ -74,23 +74,6 @@ local plugins = {
         -- refer to the configuration section below
     },
     {
-        "vhyrro/luarocks.nvim",
-        priority = 1000,
-        config = true,
-        opts = {
-            luarocks_build_args = {
-                "--with-lua-include=/usr/include",
-            }
-        }
-    },
-    {
-        "nvim-neorg/neorg",
-        dependencies = { "luarocks.nvim" },
-        lazy = false,  -- Disable lazy loading as some `lazy.nvim` distributions set `lazy = true` by default
-        version = "*", -- Pin Neorg to the latest stable release
-        config = true,
-    },
-    {
         'nvim-java/nvim-java',
         dependencies = {
             'nvim-java/lua-async-await',
@@ -116,6 +99,7 @@ local opts = {}
 
 require("lazy").setup(plugins, opts)
 vim.cmd("colorscheme gruvbox")
+
 require('java').setup()
 
 -- Treesitter
@@ -161,7 +145,6 @@ function InsertControlChar(char)
     vim.cmd(command)
 end
 
-
 -- MASON
 
 require("mason").setup()
@@ -170,13 +153,20 @@ require("mason-lspconfig").setup()
 
 -- TELESCOPE
 
+require("telescope").setup({
+    defaults = {
+        path_display = { "smart" }
+    }
+})
+
 local builtin = require("telescope.builtin")
 
-local save_keycommand = "<C-s>"
+local save_keycommand = "<leader>i"
 
 local default_keymaps = function()
-    key_set('n', "<C-a>", "ggVG<CR>", {noremap = true})
-    key_set('n', "<leader>cc", [[:lua InsertControlChar(tonumber(vim.fn.input("Enter ASCII value: ")))<CR>]], {noremap = true})
+    key_set('n', "<C-a>", "ggVG<CR>", { noremap = true })
+    key_set('n', "<leader>icc", [[:lua InsertControlChar(tonumber(vim.fn.input("Enter ASCII value: ")))<CR>]],
+        { noremap = true })
     key_set('n', '<Esc>', '<cmd>nohlsearch<CR>')
     key_set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
     key_set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -235,7 +225,7 @@ vim.opt.completeopt = { "menu", "menuone", "noselect" }
 
 require("lspconfig").lua_ls.setup({
     capabilities = capabilities,
-    on_attach = function(client)
+    on_attach = function(_)
         key_set('n', "<leader>cc", [[:lua ToggleComment("-- ", vim.v.count)<CR>]], { noremap = true })
     end,
     settings = {
@@ -252,7 +242,8 @@ require("lspconfig").lua_ls.setup({
 require("lspconfig").marksman.setup({
     capabilities = capabilities,
     on_attach = function(client)
-        key_set("n", save_keycommand, ":w<cr><cmd>execute 'silent !prettier % --write '<cr>", { noremap = true, silent = true })
+        key_set("n", save_keycommand, ":w<cr><cmd>execute 'silent !prettier % --write '<cr>",
+            { noremap = true, silent = true })
     end
 })
 
@@ -275,12 +266,11 @@ require("lspconfig").lemminx.setup({
     end
 })
 
-local gleam_cmd = { "gleam", "lsp" }
 
 require("lspconfig").gleam.setup({
     capabilities = capabilities,
-    cmd = gleam_cmd,
-    on_attach = function(client)
+    cmd = { "gleam", "lsp" },
+    on_attach = function(_)
         key_set('n', "<leader>cc", [[:lua ToggleComment("// ", vim.v.count)<CR>]], { noremap = true })
     end
 })
@@ -296,7 +286,7 @@ require("lspconfig").groovyls.setup({
 
 require("lspconfig").tsserver.setup {
     capabilities = capabilities,
-    on_attach = function(client)
+    on_attach = function(_)
         key_set('n', "<leader>cc", [[:lua ToggleComment("// ", vim.v.count)<CR>]], { noremap = true })
         key_set("n", save_keycommand, ":silent w<cr>:silent !prettier % --write <cr>", { noremap = true, silent = true })
     end
@@ -304,21 +294,21 @@ require("lspconfig").tsserver.setup {
 
 require("lspconfig").html.setup {
     capabilities = capabilities,
-    on_attach = function(client)
+    on_attach = function(_)
         key_set("n", save_keycommand, ":w<cr><cmd>!prettier % --write <cr>", { noremap = true, silent = true })
     end,
 }
 
 require("lspconfig").cssls.setup {
     capabilities = capabilities,
-    on_attach = function(client)
+    on_attach = function(_)
         key_set("n", save_keycommand, ":w<cr><cmd>!prettier % --write <cr>", { noremap = true, silent = true })
     end,
 }
 
 require("lspconfig").jsonls.setup {
     capabilities = capabilities,
-    on_attach = function(client)
+    on_attach = function(_)
         key_set("n", save_keycommand, ":w<cr><cmd>!prettier % --write <cr>", { noremap = true, silent = true })
     end
 }
@@ -363,9 +353,9 @@ require('clipboard-image').setup({
 key_set("n", "<C-p>", ":PasteImg<CR>", { noremap = true })
 
 -- Open image link under the cursor in a markdown file using feh
-vim.api.nvim_set_keymap('n', '<Leader>o', ':lua open_image_link_under_cursor()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>o', ':lua Open_image_link_under_cursor()<CR>', { noremap = true, silent = true })
 
-function open_image_link_under_cursor()
+function Open_image_link_under_cursor()
     local line = vim.fn.getline('.')
     local image_path = string.match(line, "%((.-)%)")
 
