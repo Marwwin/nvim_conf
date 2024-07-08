@@ -3,7 +3,7 @@ local key_set = vim.keymap.set
 
 -- FLAGS
 vim.g.mapleader = " "
-vim.g.maplocalleader = " "
+vim.g.maplocalleader = ","
 vim.g.have_nerd_font = true
 
 vim.opt.clipboard = "unnamedplus"
@@ -74,26 +74,23 @@ local plugins = {
         -- refer to the configuration section below
     },
     {
-        'nvim-java/nvim-java',
-        dependencies = {
-            'nvim-java/lua-async-await',
-            'nvim-java/nvim-java-core',
-            'nvim-java/nvim-java-test',
-            'nvim-java/nvim-java-dap',
-            'MunifTanjim/nui.nvim',
-            'neovim/nvim-lspconfig',
-            'mfussenegger/nvim-dap',
-            {
-                'williamboman/mason.nvim',
-                opts = {
-                    registries = {
-                        'github:nvim-java/mason-registry',
-                        'github:mason-org/mason-registry',
-                    },
-                },
-            }
-        }
+        "stevearc/oil.nvim",
+        dependencies =  {"nvim-tree/nvim-web-devicons"},
+        config = function ()
+            require("oil").setup({
+                columns = { "icon"},
+                keymaps = {["<C-h>"] = false, ["<M-h>"] = "actions.select_split",},
+                view_options = {
+                    show_hidden = true,
+                }
+            })
+             key_set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+             key_set("n", "<leader>-", require("oil").toggle_float, { desc = "Open parent directory" })
+        end
     },
+    {
+        "Olical/conjure"
+    }
 }
 
 local opts = {}
@@ -101,12 +98,11 @@ local opts = {}
 require("lazy").setup(plugins, opts)
 vim.cmd("colorscheme gruvbox")
 
-require('java').setup()
 
 -- Treesitter
 
 require 'nvim-treesitter.configs'.setup {
-    ensure_installed = { "c", "lua", "vim", "vimdoc", "html", "javascript", "python", "gleam", "java" },
+    ensure_installed = { "c", "lua", "vim", "vimdoc", "html", "javascript", "python", "gleam", "java", "fennel", "clojure"},
     sync_install = false,
     auto_install = true,
     highlight = { enable = true },
@@ -166,7 +162,7 @@ local save_keycommand = "<leader>i"
 
 local default_keymaps = function()
     key_set('n', "<C-a>", "ggVG<CR>", { noremap = true })
-    key_set('n', "<leader>icc", [[:lua InsertControlChar(tonumber(vim.fn.input("Enter ASCII value: ")))<CR>]],
+    key_set('n', "<leader>acc", [[:lua InsertControlChar(tonumber(vim.fn.input("Enter ASCII value: ")))<CR>]],
         { noremap = true })
     key_set('n', '<Esc>', '<cmd>nohlsearch<CR>')
     key_set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
@@ -204,7 +200,12 @@ local default_keymaps = function()
                 "-g", "!*/__pycache__/*",
                 "-g", "!__pycache__/*",
                 -- Gleam build folder
-                "-g", "!build/*"
+                "-g", "!build/*",
+                -- Clojure stff
+                "-g", "!.clj-kondo/",
+                "-g", "!target/",
+                "-g", "!.lsp/",
+
             }
         })
     end)
@@ -238,6 +239,14 @@ require("lspconfig").lua_ls.setup({
             }
         }
     }
+})
+
+require("lspconfig").clojure_lsp.setup({
+    capabilities = capabilities,
+    on_attach = function(_)
+        key_set('n', "<leader>cc", [[:lua ToggleComment("; ", vim.v.count)<CR>]], { noremap = true })
+    end,
+    
 })
 
 require("lspconfig").marksman.setup({
