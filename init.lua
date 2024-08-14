@@ -75,34 +75,40 @@ local plugins = {
     },
     {
         "stevearc/oil.nvim",
-        dependencies =  {"nvim-tree/nvim-web-devicons"},
-        config = function ()
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        config = function()
             require("oil").setup({
-                columns = { "icon"},
-                keymaps = {["<C-h>"] = false, ["<M-h>"] = "actions.select_split",},
+                columns = { "icon" },
+                keymaps = { ["<C-h>"] = false, ["<M-h>"] = "actions.select_split", },
                 view_options = {
                     show_hidden = true,
                 }
             })
-             key_set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
-             key_set("n", "<leader>-", require("oil").toggle_float, { desc = "Open parent directory" })
+            key_set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+            key_set("n", "<leader>-", require("oil").toggle_float, { desc = "Open parent directory" })
         end
     },
     {
         "Olical/conjure"
+    },
+    {
+        "folke/tokyonight.nvim",
+        lazy = false,
+        priority = 1000,
+        opts = {},
     }
 }
 
 local opts = {}
 
 require("lazy").setup(plugins, opts)
-vim.cmd("colorscheme gruvbox")
+vim.cmd("colorscheme tokyonight-moon")
 
 
 -- Treesitter
 
 require 'nvim-treesitter.configs'.setup {
-    ensure_installed = { "c", "lua", "vim", "vimdoc", "html", "javascript", "python", "gleam", "java", "fennel", "clojure"},
+    ensure_installed = { "c", "lua", "vim", "vimdoc", "html", "javascript", "python", "gleam", "java", "fennel", "clojure" },
     sync_install = false,
     auto_install = true,
     highlight = { enable = true },
@@ -152,7 +158,9 @@ require("mason-lspconfig").setup()
 
 require("telescope").setup({
     defaults = {
-        path_display = { "smart" }
+        path_display = { "filename_first" },
+        layout_strategy = "vertical",
+        layout_config = { width = 0.95 }
     }
 })
 
@@ -182,6 +190,17 @@ local default_keymaps = function()
     key_set("n", "gr", function() vim.cmd("Telescope lsp_references") end, { noremap = true })
     key_set("n", "<leader>fb", builtin.buffers, { noremap = true })
     key_set("n", "<leader>fg", builtin.live_grep, { noremap = true })
+    vim.keymap.set("n", "<leader>gf", function()
+        vim.ui.input({ prompt = "Enter folder to search (leave empty for all): " }, function(input)
+            if input then
+                if input == "" then
+                    require('telescope.builtin').live_grep()
+                else
+                    require('telescope.builtin').live_grep({ search_dirs = { input } })
+                end
+            end
+        end)
+    end, { noremap = true, desc = "Live grep with optional folder input" })
     key_set("n", "<leader>fs", builtin.grep_string, { noremap = true })
     key_set("n", save_keycommand, vim.lsp.buf.format, { noremap = true })
     key_set("n", "<leader>ff", function()
@@ -205,7 +224,7 @@ local default_keymaps = function()
                 "-g", "!.clj-kondo/",
                 "-g", "!target/",
                 "-g", "!.lsp/",
-
+                "-g", "!.shadow-cljs",
             }
         })
     end)
@@ -246,7 +265,7 @@ require("lspconfig").clojure_lsp.setup({
     on_attach = function(_)
         key_set('n', "<leader>cc", [[:lua ToggleComment("; ", vim.v.count)<CR>]], { noremap = true })
     end,
-    
+
 })
 
 require("lspconfig").marksman.setup({
