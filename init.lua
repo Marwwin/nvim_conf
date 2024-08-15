@@ -8,9 +8,9 @@ vim.g.have_nerd_font = true
 
 vim.opt.clipboard = "unnamedplus"
 vim.opt.expandtab = true
-vim.opt.tabstop = 4
-vim.opt.softtabstop = 4
-vim.opt.shiftwidth = 4
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+vim.opt.shiftwidth = 2
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.autoread = true
@@ -118,36 +118,6 @@ require 'nvim-treesitter.configs'.setup {
     }
 }
 
--- Functions and Autocommands
-vim.api.nvim_create_autocmd('TextYankPost', {
-    desc = 'Highlight when yanking (copying) text',
-    group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
-    callback = function()
-        vim.highlight.on_yank()
-    end,
-})
-
-
-function ToggleComment(comment, n)
-    for i = 0, n do
-        local line = vim.fn.getline('.')
-        local start_of_comment, end_of_comment = line:find(comment, 1, true)
-        if start_of_comment then
-            vim.fn.setline('.', line:sub(end_of_comment + 1))
-        else
-            vim.fn.setline('.', comment .. line)
-        end
-        if i ~= n then
-            vim.cmd("normal j")
-        end
-    end
-end
-
-function InsertControlChar(char)
-    local command = string.format(":put =nr2char(%d)", char)
-    vim.cmd(command)
-end
-
 -- MASON
 
 require("mason").setup()
@@ -166,19 +136,24 @@ require("telescope").setup({
 
 local builtin = require("telescope.builtin")
 
-local save_keycommand = "<leader>i"
+local format_shortcut_keys = "<leader>i"
 
 local default_keymaps = function()
+    -- Select All
     key_set('n', "<C-a>", "ggVG<CR>", { noremap = true })
+    -- Add Control Chars
     key_set('n', "<leader>acc", [[:lua InsertControlChar(tonumber(vim.fn.input("Enter ASCII value: ")))<CR>]],
         { noremap = true })
+    -- Basic movement etc.
     key_set('n', '<Esc>', '<cmd>nohlsearch<CR>')
     key_set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
     key_set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
     key_set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
     key_set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
-    key_set("n", "K", vim.lsp.buf.hover, { noremap = true })
     key_set("n", "<leader>m", vim.cmd(":messages"), { noremap = true })
+    -- General LSP Shortcuts
+    key_set("n", format_shortcut_keys, vim.lsp.buf.format, { noremap = true })
+    key_set("n", "K", vim.lsp.buf.hover, { noremap = true })
     key_set({ "n", "v" }, "<M-d>", vim.lsp.buf.code_action, { noremap = true })
     key_set("n", "<leader>r", vim.lsp.buf.rename, { noremap = true })
     key_set("n", "gd", vim.lsp.buf.definition, { noremap = true })
@@ -186,11 +161,12 @@ local default_keymaps = function()
     key_set("n", "gt", vim.lsp.buf.type_definition, { noremap = true })
     key_set("n", "<leader>dj", vim.diagnostic.goto_next, { noremap = true })
     key_set("n", "<leader>dk", vim.diagnostic.goto_prev, { noremap = true })
+    -- Telescope things
     key_set("n", "<leader>dd", function() vim.cmd("Telescope diagnostics") end, { noremap = true })
     key_set("n", "gr", function() vim.cmd("Telescope lsp_references") end, { noremap = true })
     key_set("n", "<leader>fb", builtin.buffers, { noremap = true })
     key_set("n", "<leader>fg", builtin.live_grep, { noremap = true })
-    vim.keymap.set("n", "<leader>gf", function()
+    key_set("n", "<leader>gf", function()
         vim.ui.input({ prompt = "Enter folder to search (leave empty for all): " }, function(input)
             if input then
                 if input == "" then
@@ -202,9 +178,9 @@ local default_keymaps = function()
         end)
     end, { noremap = true, desc = "Live grep with optional folder input" })
     key_set("n", "<leader>fs", builtin.grep_string, { noremap = true })
-    key_set("n", save_keycommand, vim.lsp.buf.format, { noremap = true })
     key_set("n", "<leader>ff", function()
         builtin.find_files({
+            -- Folders to ignore when doing find files
             find_command = {
                 "rg", "--files",
                 "--hidden", "--follow",
@@ -228,7 +204,7 @@ local default_keymaps = function()
             }
         })
     end)
-
+    -- Trouble shortcuts
     key_set("n", "<leader>xx", function() require("trouble").toggle() end)
     key_set("n", "<leader>xw", function() require("trouble").toggle("workspace_diagnostics") end)
     key_set("n", "<leader>xd", function() require("trouble").toggle("document_diagnostics") end)
@@ -271,14 +247,13 @@ require("lspconfig").clojure_lsp.setup({
 require("lspconfig").marksman.setup({
     capabilities = capabilities,
     on_attach = function(client)
-        key_set("n", save_keycommand, ":w<cr><cmd>execute 'silent !prettier % --write '<cr>",
+        key_set("n", format_shortcut_keys, ":w<cr><cmd>execute 'silent !prettier % --write '<cr>",
             { noremap = true, silent = true })
     end
 })
 
 require("lspconfig").jdtls.setup({
     capabilities = capabilities,
-
 })
 
 require("lspconfig").sqlls.setup({
@@ -308,7 +283,7 @@ require("lspconfig").groovyls.setup({
     capabilities = capabilities,
     on_attach = function(client)
         print("Attaching " .. client.name)
-        key_set("n", save_keycommand, ":silent w<cr>:silent !npm-groovy-lint --format % % <cr>",
+        key_set("n", format_shortcut_keys, ":silent w<cr>:silent !npm-groovy-lint --format % % <cr>",
             { noremap = true, silent = true })
     end
 })
@@ -317,33 +292,33 @@ require("lspconfig").tsserver.setup {
     capabilities = capabilities,
     on_attach = function(_)
         key_set('n', "<leader>cc", [[:lua ToggleComment("// ", vim.v.count)<CR>]], { noremap = true })
-        key_set("n", save_keycommand, ":silent w<cr>:silent !prettier % --write <cr>", { noremap = true, silent = true })
+        key_set("n", format_shortcut_keys, ":silent w<cr>:silent !prettier % --write <cr>", { noremap = true, silent = true })
     end
 }
 
 require("lspconfig").html.setup {
     capabilities = capabilities,
     on_attach = function(_)
-        key_set("n", save_keycommand, ":w<cr><cmd>!prettier % --write <cr>", { noremap = true, silent = true })
+        key_set("n", format_shortcut_keys, ":w<cr><cmd>!prettier % --write <cr>", { noremap = true, silent = true })
     end,
 }
 
 require("lspconfig").cssls.setup {
     capabilities = capabilities,
     on_attach = function(_)
-        key_set("n", save_keycommand, ":w<cr><cmd>!prettier % --write <cr>", { noremap = true, silent = true })
+        key_set("n", format_shortcut_keys, ":w<cr><cmd>!prettier % --write <cr>", { noremap = true, silent = true })
     end,
 }
 
 require("lspconfig").jsonls.setup {
     capabilities = capabilities,
     on_attach = function(_)
-        key_set("n", save_keycommand, ":w<cr><cmd>!prettier % --write <cr>", { noremap = true, silent = true })
+        key_set("n", format_shortcut_keys, ":w<cr><cmd>!prettier % --write <cr>", { noremap = true, silent = true })
     end
 }
 
 -- COMPARE
--- Setup nvim-vmp
+-- Setup nvim-cmp
 
 local cmp = require('cmp')
 
@@ -373,17 +348,46 @@ cmp.setup({
 
 require('clipboard-image').setup({
     default = {
-        img_dir = "/home/mka/Pictures/Screenshots",
-        img_dir_txt = "/home/mka/Pictures/Screenshots"
+        img_dir = "/home/mka/Media/Screenshots",
+        img_dir_txt = "/home/mka/Media/Screenshots"
     }
 })
+
+-- Functions and Autocommands
+
+vim.api.nvim_create_autocmd('TextYankPost', {
+    desc = 'Highlight when yanking (copying) text',
+    group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+    callback = function()
+        vim.highlight.on_yank()
+    end,
+})
+
+
+function ToggleComment(comment, n)
+    for i = 0, n do
+        local line = vim.fn.getline('.')
+        local start_of_comment, end_of_comment = line:find(comment, 1, true)
+        if start_of_comment then
+            vim.fn.setline('.', line:sub(end_of_comment + 1))
+        else
+            vim.fn.setline('.', comment .. line)
+        end
+        if i ~= n then
+            vim.cmd("normal j")
+        end
+    end
+end
+
+function InsertControlChar(char)
+    local command = string.format(":put =nr2char(%d)", char)
+    vim.cmd(command)
+end
 
 -- Paste image from clipboard
 key_set("n", "<C-p>", ":PasteImg<CR>", { noremap = true })
 
 -- Open image link under the cursor in a markdown file using feh
-vim.api.nvim_set_keymap('n', '<Leader>o', ':lua Open_image_link_under_cursor()<CR>', { noremap = true, silent = true })
-
 function Open_image_link_under_cursor()
     local line = vim.fn.getline('.')
     local image_path = string.match(line, "%((.-)%)")
@@ -399,3 +403,5 @@ function Open_image_link_under_cursor()
         print('Error: No image link under the cursor!')
     end
 end
+
+vim.api.nvim_set_keymap('n', '<Leader>o', ':lua Open_image_link_under_cursor()<CR>', { noremap = true, silent = true })
